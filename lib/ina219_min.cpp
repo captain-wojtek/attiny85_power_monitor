@@ -1,7 +1,21 @@
 #include "ina219_min.h"
 #include "TinyWireM.h"
 
-#define INA219_SHUNT_OHMS 0.1 
+#define config_reg      0x00
+#define shunt_reg       0x01
+#define bus_reg         0x02
+#define power_reg       0x03
+#define current_reg     0x04
+#define calibration_reg 0x05
+
+#define R_shunt         0.1 
+#define max_current     2          //amps
+#define bus_lsb         0.004f     //V
+#define shunt_lsb       0.00001f   //V
+
+float current_lsb = (max_current/32768.0f);
+float power_lsb = current_lsb * 20;
+uint16_t calib_value = (uint16_t)(((0.04096f)/(current_lsb * R_shunt)) + 0.5f);
 
 static void ina219_write16(uint8_t reg, uint16_t value)
 {
@@ -31,36 +45,42 @@ void ina219_init(void)
 {
     /* Configuration:
        - 32V range
-       - 320mV shunt
+       - +-320mV shunt range
        - 12-bit ADC
-       - Continuous bus + shunt
+       - Shunt + Bus, continuous
     */
-    ina219_write16(0x00, 0x399F);
+    
+    ina219_write16(config_reg, 0x399F);
+    ina219_write16(calibration_reg, calib_value);
 }
 
-uint16_t ina219_read_bus_volt(void)
+float ina219_read_bus_volt(void)
 {
-    uint16_t raw = ina219_read16(0x02);
+    uint16_t raw = ina219_read16(bus_reg);
     raw >>= 3;              // lower 3 bits are flags
-    return raw * 4;         // 4 mV per bit
+    return raw * bus_lsb;         
 }
 
-int16_t ina219_read_shunt_volt(void)
+float ina219_read_shunt_volt(void)
 {
-    int16_t raw = (int16_t)ina219_read16(0x01);
-    // 10uV per bit for default 12-bit ADC
-    return raw * 10 / 1000; // convert to mV
+    int16_t raw = (int16_t)ina219_read16(shunt_reg);
+    return raw * shunt_lsb; 
 }
 
-// Current in mA
-int16_t ina219_read_current(void)
+float ina219_read_current(void)
 {
-    int16_t vshunt = ina219_read_shunt_volt();
-    return (vshunt) / INA219_SHUNT_OHMS;
+    int16_t raw = (int16_t)ina219_read16(current_reg);
+    return raw * current_lsb;
 }
 
-int16_t ina219_read_power(void)
+float ina219_read_power(void)
 {
-    int16_t power = (ina219_read_bus_volt() * ina219_read_current())/1000;
-    return power;  
+    uint16_t raw = ina219_read16(power_reg);
+    return raw * power_lsb;  
+}
+
+int16_t ina219_read_calib(void)
+{
+    int16_t raw = ina219_read16(calibration_reg);
+    return raw;
 }
