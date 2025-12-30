@@ -8,10 +8,6 @@
 
 SSD1306_Mini ssd;
 
-char buf_volt[12];
-char buf_curr[12];
-char buf_power[12];
-
 void print_fixed_3(int32_t value)
 {
     char buf[12];
@@ -31,7 +27,6 @@ void print_fixed_3(int32_t value)
     ssd.printString(buf);
 }
 
-
 int main(void)
 {
     TinyWireM.begin();
@@ -45,8 +40,8 @@ int main(void)
         int32_t vbus = (int32_t)(ina219_read_bus_volt() * 1000.0f + 0.5f);
         int32_t vshunt = (int32_t)(ina219_read_shunt_volt() * 1000.0f + 0.5f);
         int32_t vbat = (int32_t)(vbus + vshunt);
-        int32_t current = (int32_t)(ina219_read_current() * 1000.0f * 0.5f);
-        int32_t power = (int32_t)(ina219_read_power() * 1000.0f * 0.5f) ;
+        int32_t current = (int32_t)(ina219_read_current() * 1000.0f + 0.5f);
+        int32_t power = (int32_t)(ina219_read_power() * 1000.0f + 0.5f);
 
         ssd.cursorTo(0, 0);
         ssd.printString("Volt:");
@@ -66,4 +61,3 @@ int main(void)
         _delay_ms(500);
     }
 }
-

@@ -10,7 +10,6 @@ float ina219_read_bus_volt(void);
 float ina219_read_shunt_volt(void);
 float ina219_read_current(void);
 float ina219_read_power(void);
-int16_t ina219_read_calib(void);
 
 #endif
 

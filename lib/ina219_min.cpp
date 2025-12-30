@@ -63,7 +63,7 @@ float ina219_read_bus_volt(void)
 
 float ina219_read_shunt_volt(void)
 {
-    int16_t raw = (int16_t)ina219_read16(shunt_reg);
+    float raw = ina219_read16(shunt_reg);
     return raw * shunt_lsb; 
 }
 
@@ -79,8 +79,3 @@ float ina219_read_power(void)
     return raw * power_lsb;  
 }
 
-int16_t ina219_read_calib(void)
-{
-    int16_t raw = ina219_read16(calibration_reg);
-    return raw;
-}
