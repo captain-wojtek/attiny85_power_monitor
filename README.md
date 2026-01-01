@@ -16,7 +16,7 @@ I bought all these components from robu.in and I couldn't get the links for few 
 
 ## Connection
 
-Images for the connections is present in docs folder. Few things to look for when trying to make the connections:
+Images for the connections is present in [docs](docs/battery_monitor.png) folder. Few things to look for when trying to make the connections:
 - For I2C, use PB0 for SDA and PB2 for SCL as PB1 has some interference with the USB port in this Digispark module
 - The INA219 module and Attiny85 should have a common ground. Since it is portable and I can power the module with the battery, it works fine but if you keep different grounds for these, the readings would be rubbish
 - Since this has a USB interface and you can flash through this, I would not recommend powering the board from USB as well as the battery at the same time. I didn't face any issues with this but I won't recommend it for safety purposes.
